@@ -1,0 +1,6 @@
+class Solution:
+    def strStr(self, haystack: str, needle: str):
+        return haystack.find(needle)
+         
+res = Solution().strStr("i_am_a_girl","girl")
+print(res)
