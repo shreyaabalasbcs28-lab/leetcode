@@ -1,0 +1,46 @@
+#include <stdbool.h>
+typedef struct Node {
+    int val;
+    struct Node* next;
+} Node;
+int findMaximumXOR(int* nums, int numsSize) {
+    int maxResult = 0;
+    int mask = 0;
+    for (int i = 30; i >= 0; i--) {
+        mask = mask | (1 << i);
+        int greedyCandidate = maxResult | (1 << i);
+        int tableSize = 40009; 
+        Node** hashTable = (Node**)calloc(tableSize, sizeof(Node*));
+        Node* pool = (Node*)malloc(numsSize * sizeof(Node));
+        int poolIdx = 0;
+        for (int j = 0; j < numsSize; j++) {
+            int prefix = nums[j] & mask;
+            int hash = (prefix < 0 ? -prefix : prefix) % tableSize;
+            Node* newNode = &pool[poolIdx++];
+            newNode->val = prefix;
+            newNode->next = hashTable[hash];
+            hashTable[hash] = newNode;
+        }
+        bool found = false;
+        for (int j = 0; j < numsSize; j++) {
+            int prefix = nums[j] & mask;
+            int target = prefix ^ greedyCandidate;
+            int hash = (target < 0 ? -target : target) % tableSize;
+            Node* curr = hashTable[hash];
+            while (curr != NULL) {
+                if (curr->val == target) {
+                    found = true;
+                    break;
+                }
+                curr = curr->next;
+            }
+            if (found) break;
+        }
+        free(hashTable);
+        free(pool);
+        if (found) {
+            maxResult = greedyCandidate;
+        }
+    }
+    return maxResult;
+}
