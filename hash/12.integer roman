@@ -1,0 +1,21 @@
+#include <stdlib.h>
+#include <string.h>
+
+char* intToRoman(int num) {
+    char* s = (char*)malloc(20 * sizeof(char));
+    s[0] = '\0'; 
+    while (num >= 1000) { strcat(s, "M"); num -= 1000; }
+    while (num >= 900)  { strcat(s, "CM"); num -= 900; }
+    while (num >= 500)  { strcat(s, "D"); num -= 500; }
+    while (num >= 400)  { strcat(s, "CD"); num -= 400; }
+    while (num >= 100)  { strcat(s, "C"); num -= 100; }
+    while (num >= 90)   { strcat(s, "XC"); num -= 90; }
+    while (num >= 50)   { strcat(s, "L"); num -= 50; }
+    while (num >= 40)   { strcat(s, "XL"); num -= 40; }
+    while (num >= 10)   { strcat(s, "X"); num -= 10; }
+    while (num >= 9)    { strcat(s, "IX"); num -= 9; }
+    while (num >= 5)    { strcat(s, "V"); num -= 5; }
+    while (num >= 4)    { strcat(s, "IV"); num -= 4; }
+    while (num >= 1)    { strcat(s, "I"); num -= 1; }
+    return s;
+}
