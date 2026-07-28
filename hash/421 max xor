@@ -1,0 +1,71 @@
+#include <stdbool.h>
+
+// Helper structure for a simple Hash Set bucket to handle collisions
+typedef struct Node {
+    int val;
+    struct Node* next;
+} Node;
+
+int findMaximumXOR(int* nums, int numsSize) {
+    int maxResult = 0;
+    int mask = 0;
+
+    // We go from the 30th bit down to the 0th bit (since inputs fit in 31-bit integers)
+    for (int i = 30; i >= 0; i--) {
+        // Set the i-th bit in the mask to 1
+        mask = mask | (1 << i);
+        
+        // This is the ideal maximum XOR we want to achieve up to the i-th bit
+        int greedyCandidate = maxResult | (1 << i);
+
+        // Create a simple, fast Hash Table array for O(1) lookups
+        // Using a prime number size close to or larger than common array sizes
+        int tableSize = 40009; 
+        Node** hashTable = (Node**)calloc(tableSize, sizeof(Node*));
+        Node* pool = (Node*)malloc(numsSize * sizeof(Node));
+        int poolIdx = 0;
+
+        // Step 1: Insert the prefixes of all numbers into the hash table
+        for (int j = 0; j < numsSize; j++) {
+            int prefix = nums[j] & mask;
+            int hash = (prefix < 0 ? -prefix : prefix) % tableSize;
+            
+            // Link into hash table bucket
+            Node* newNode = &pool[poolIdx++];
+            newNode->val = prefix;
+            newNode->next = hashTable[hash];
+            hashTable[hash] = newNode;
+        }
+
+        // Step 2: Check if any prefix can pair with another to make our greedy candidate
+        bool found = false;
+        for (int j = 0; j < numsSize; j++) {
+            int prefix = nums[j] & mask;
+            // The math trick: if A ^ B = C, then A ^ C = B
+            int target = prefix ^ greedyCandidate;
+            int hash = (target < 0 ? -target : target) % tableSize;
+
+            // Search the bucket
+            Node* curr = hashTable[hash];
+            while (curr != NULL) {
+                if (curr->val == target) {
+                    found = true;
+                    break;
+                }
+                curr = curr->next;
+            }
+            if (found) break;
+        }
+
+        // Free memory for this bit round
+        free(hashTable);
+        free(pool);
+
+        // If we found a valid pair, our greedy candidate is possible!
+        if (found) {
+            maxResult = greedyCandidate;
+        }
+    }
+
+    return maxResult;
+}
