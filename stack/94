@@ -1,0 +1,13 @@
+class Solution {
+private:
+    vector<int> res; 
+public:
+    vector<int> inorderTraversal(TreeNode* temp) {
+        if(temp != nullptr){
+            inorderTraversal(temp->left);
+            res.push_back(temp->val); 
+            inorderTraversal(temp->right);
+        }
+        return res; 
+    }
+};
